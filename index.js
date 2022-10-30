@@ -1,9 +1,9 @@
-const mysql2 = require("mysql2");
+const mysql = require("mysql2");
 const consoleTable = require("console.table");
 const inquirer = require("inquirer");
 
 // create the connection information for the sql database
-const connection = mysql2.createConnection({
+const mysqlconnection = mysql.createConnection({
   host: "localhost",
 
   // Your port; if not 3306
@@ -14,7 +14,7 @@ const connection = mysql2.createConnection({
 
   // Your password
   password: "password",
-  database: "your_business_DB",
+  database: "your_business_db",
 });
 
 // function which prompts the user to pick what they want to do when first opening up the app in the command line
@@ -57,22 +57,22 @@ const openingPrompt = () => {
 
 //function to view departments table
 const viewAllDepartments = () => {
-  connection.query("SELECT * FROM department", function (err, res) {
+  mysqlconnection.query("SELECT * FROM department", function (err, res) {
     if (err) throw err;
     return res;
   });
 };
 
-connection.connect((err) => {
-  if (err) throw err;
-  // run the start function after the connection is made to prompt the user
+// connection.connect((err) => {
+//   if (err) throw err;
+//   // run the start function after the connection is made to prompt the user
+//   openingPrompt();
+// });
+
+//function to initialize the application when the user types in node index.js in command line
+function init() {
   openingPrompt();
-});
+}
 
-// //function to initialize the application when the user types in node index.js in command line
-// function init() {
-//     openingPrompt();
-//   }
-
-//   //calling init function
-//   init();
+//calling init function
+init();
