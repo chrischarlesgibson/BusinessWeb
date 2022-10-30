@@ -1,41 +1,46 @@
--- //schema for department 
-DROP DATABASE IF EXISTS department_db;
-CREATE DATABASE department_db;
 
-USE department_db;
+-- creating db for the company
+DROP DATABASE IF EXISTS your_business_db;
+
+CREATE DATABASE your_business_db;
+
+USE your_business_db;
+
+-- //schema table for department 
+DROP TABLE IF EXISTS department;
 
 CREATE TABLE department (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  department_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   department_name VARCHAR(30) NOT NULL
 );
 
--- //schema for role
-DROP DATABASE IF EXISTS role_db;
-CREATE DATABASE role_db;
-
-USE role_db;
+-- //schema table for role
+DROP TABLE IF EXISTS employee_role;
 
 CREATE TABLE employee_role (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(30) NOT NULL
-  salary DECIMAL NOT 
+  role_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(30) NOT NULL,
+  salary DECIMAL NOT NULL,
+  department_id INT,
   FOREIGN KEY (department_id)
-  REFERENCES department(id)
+  REFERENCES department(department_id)
   ON DELETE SET NULL
 );
 
--- //schema for employee
-DROP DATABASE IF EXISTS employee_info_db;
-CREATE DATABASE employee_info__db;
-
-USE employee_info__db;
+-- //schema table for employee
+DROP TABLE IF EXISTS employee_info;
 
 CREATE TABLE employee_info(
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  first_name VARCHAR(30) NOT NULL
-  last_name VARCHAR(30) NOT NULL
+  employee_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(30) NOT NULL,
+  last_name VARCHAR(30) NOT NULL,
+  role_id INT,
   FOREIGN KEY (role_id)
-  REFERENCES employee_role(id)
+  REFERENCES employee_role(role_id)
+  ON DELETE SET NULL,
+  manager_id INT,
+  FOREIGN KEY (manager_id)
+  REFERENCES employee_info(employee_id)
   ON DELETE SET NULL
 );
 
