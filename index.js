@@ -1,15 +1,12 @@
 const mysql = require("mysql2");
-const consoleTable = require("console.table");
+const cTable = require("console.table");
 const inquirer = require("inquirer");
 
 // create the connection information for the sql database
 const mysqlconnection = mysql.createConnection({
   host: "localhost",
 
-  // Your port; if not 3306
   port: 3306,
-
-  // Your username
   user: "root",
 
   // Your password
@@ -22,7 +19,7 @@ const openingQuestion = [
   {
     type: "list",
     message: "What do you want to do?",
-    name: "openingQuestionName",
+    name: "task",
     choices: [
       "view all departments",
       "view all roles",
@@ -37,37 +34,37 @@ const openingQuestion = [
 
 const openingPrompt = () => {
   inquirer.prompt(openingQuestion).then((response) => {
-    if (response === "view all departments") {
+    if (response.task === "view all departments") {
       viewAllDepartments();
-    } else if (response === "view all roles") {
+    } else if (response.task === "view all roles") {
       viewAllRoles();
-    } else if (response === "view all employees") {
+    } else if (response.task === "view all employees") {
       viewAllEmployees();
-    } else if (response === "add a department") {
+    } else if (response.task === "add a department") {
       addDepartment();
-    } else if (response === "add a role") {
+    } else if (response.task === "add a role") {
       addRole();
-    } else if (response === "add an employee") {
+    } else if (response.task === "add an employee") {
       addEmployee();
-    } else if (response === "update an employee role") {
+    } else if (response.task === "update an employee role") {
       updateRole();
     }
   });
 };
 
-//function to view departments table
-const viewAllDepartments = () => {
-  mysqlconnection.query("SELECT * FROM department", function (err, res) {
-    if (err) throw err;
-    return res;
-  });
-};
-
-// connection.connect((err) => {
+// mysqlconnection.connect((err) => {
 //   if (err) throw err;
 //   // run the start function after the connection is made to prompt the user
 //   openingPrompt();
 // });
+
+//function to view departments table
+function viewAllDepartments() {
+  mysqlconnection.query("SELECT * FROM department;", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+  });
+}
 
 //function to initialize the application when the user types in node index.js in command line
 function init() {
