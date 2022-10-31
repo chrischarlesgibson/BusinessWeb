@@ -121,12 +121,9 @@ function addDepartment() {
 
 function addRole() {
   inquirer.prompt(addRoleQuestions).then((response) => {
-    console.log(response.roleName);
-    console.log(response.roleSalary);
-    console.log(response.roleDepartment);
     mysqlconnection.query(`INSERT INTO employee_role(title,salary)
-    VALUES ("${response.roleName}", ${response.roleSalary});
-  INSERT INTO department(department_name)
+    VALUES ("${response.roleName}", ${response.roleSalary});`);
+    mysqlconnection.query(`INSERT INTO department(department_name)
   VALUES ("${response.roleDepartment}");`);
   });
 }
