@@ -147,12 +147,8 @@ function addRole() {
 
 function addEmployee() {
   inquirer.prompt(addEmployeeQuestions).then((response) => {
-    mysqlconnection.query(`INSERT INTO employee_info(first_name,last_name)
-    VALUES ("${response.firstName}", "${response.lastName}");`);
-    mysqlconnection.query(`INSERT INTO employee_info(manager_id)
-    VALUES (${response.employeeManager});`);
-    mysqlconnection.query(`INSERT INTO employee_role(title)
-  VALUES ("${response.employeeRole}");`);
+    mysqlconnection.query(`INSERT INTO employee_info(first_name,last_name, manager_id, title)
+    VALUES ("${response.firstName}", "${response.lastName}"), ${response.employeeManager},"${response.employeeRole}";`);
   });
 }
 //function to initialize the application when the user types in node index.js in command line
@@ -162,3 +158,10 @@ function init() {
 
 //calling init function
 init();
+
+// mysqlconnection.query(`INSERT INTO employee_info(first_name,last_name)
+// VALUES ("${response.firstName}", "${response.lastName}");`);
+// mysqlconnection.query(`INSERT INTO employee_info(manager_id)
+// VALUES (${response.employeeManager});`);
+// mysqlconnection.query(`INSERT INTO employee_role(title)
+// VALUES ("${response.employeeRole}");`);
