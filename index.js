@@ -58,6 +58,29 @@ const addRoleQuestions = [
   },
 ];
 
+const addEmployeeQuestions = [
+  {
+    type: "input",
+    message: "What is the employee's first name?",
+    name: "firstName",
+  },
+  {
+    type: "input",
+    message: "What is the employee's last name?",
+    name: "lastName",
+  },
+  {
+    type: "input",
+    message: "What is the employee's role?",
+    name: "employeeRole",
+  },
+  {
+    type: "input",
+    message: "Who is the employee's manager?",
+    name: "employeeManager",
+  },
+];
+
 const openingPrompt = () => {
   inquirer.prompt(openingQuestion).then((response) => {
     if (response.task === "view all departments") {
@@ -77,12 +100,6 @@ const openingPrompt = () => {
     }
   });
 };
-
-// mysqlconnection.connect((err) => {
-//   if (err) throw err;
-//   // run the start function after the connection is made to prompt the user
-//   openingPrompt();
-// });
 
 // function to view all departments
 function viewAllDepartments() {
@@ -128,6 +145,16 @@ function addRole() {
   });
 }
 
+function addEmployee() {
+  inquirer.prompt(addEmployeeQuestions).then((response) => {
+    mysqlconnection.query(`INSERT INTO employee_info(first_name,last_name)
+    VALUES ("${response.firstName}", "${response.lastName}");`);
+    mysqlconnection.query(`INSERT INTO employee_info(manager_id)
+    VALUES (${response.employeeManager});`);
+    mysqlconnection.query(`INSERT INTO employee_role(title)
+  VALUES ("${response.employeeRole}");`);
+  });
+}
 //function to initialize the application when the user types in node index.js in command line
 function init() {
   openingPrompt();
