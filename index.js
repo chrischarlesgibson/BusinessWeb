@@ -32,6 +32,32 @@ const openingQuestion = [
   },
 ];
 
+const addDepartmentQuestion = [
+  {
+    type: "input",
+    message: "Enter the department's name",
+    name: "departmentName",
+  },
+];
+
+const addRoleQuestions = [
+  {
+    type: "input",
+    message: "What is the role?",
+    name: "roleName",
+  },
+  {
+    type: "input",
+    message: "What is the role's salary?",
+    name: "roleSalary",
+  },
+  {
+    type: "input",
+    message: "What department is the role in?",
+    name: "roleDepartment",
+  },
+];
+
 const openingPrompt = () => {
   inquirer.prompt(openingQuestion).then((response) => {
     if (response.task === "view all departments") {
@@ -86,9 +112,25 @@ function viewAllEmployees() {
     }
   );
 }
+function addDepartment() {
+  inquirer.prompt(addDepartmentQuestion).then((response) => {
+    mysqlconnection.query(`INSERT INTO department(department_id,department_name)
+  VALUES (0, "${response.departmentName}")`);
+  });
+}
 
-// `SELECT employee_info.employee_id, employee_info.first_name,employee_info.last_name, employee_info.manager_id, employee_role.title, employee_role.salary, department.department_name JOIN employee_role ON  employee_info.role_id=employee_role.role_id
-// JOIN department ON employee_role.department_id= departmet.department_id`;
+function addRole() {
+  inquirer.prompt(addRoleQuestions).then((response) => {
+    console.log(response.roleName);
+    console.log(response.roleSalary);
+    console.log(response.roleDepartment);
+    mysqlconnection.query(`INSERT INTO employee_role(title,salary)
+    VALUES ("${response.roleName}", ${response.roleSalary});
+  INSERT INTO department(department_name)
+  VALUES ("${response.roleDepartment}");`);
+  });
+}
+
 //function to initialize the application when the user types in node index.js in command line
 function init() {
   openingPrompt();
