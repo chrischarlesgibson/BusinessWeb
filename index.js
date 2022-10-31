@@ -58,7 +58,7 @@ const openingPrompt = () => {
 //   openingPrompt();
 // });
 
-//function to view departments table
+// function to view all departments
 function viewAllDepartments() {
   mysqlconnection.query("SELECT * FROM department;", function (err, res) {
     if (err) throw err;
@@ -66,6 +66,29 @@ function viewAllDepartments() {
   });
 }
 
+//function to view all roles
+function viewAllRoles() {
+  mysqlconnection.query("SELECT * FROM employee_role;", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+  });
+}
+
+//function to view all employees
+function viewAllEmployees() {
+  mysqlconnection.query(
+    `SELECT department.department_name, employee_role.title, employee_role.salary, employee_info.employee_id, employee_info.first_name,employee_info.last_name, employee_info.manager_id
+     FROM department JOIN employee_role ON department.department_id= employee_role.department_id
+     JOIN employee_info ON employee_role.role_id =employee_info.role_id`,
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+    }
+  );
+}
+
+// `SELECT employee_info.employee_id, employee_info.first_name,employee_info.last_name, employee_info.manager_id, employee_role.title, employee_role.salary, department.department_name JOIN employee_role ON  employee_info.role_id=employee_role.role_id
+// JOIN department ON employee_role.department_id= departmet.department_id`;
 //function to initialize the application when the user types in node index.js in command line
 function init() {
   openingPrompt();
