@@ -205,7 +205,7 @@ function addRole() {
         },
         {
           type: "list",
-          name: "departmentList",
+          name: "roleDepartment",
 
           choices: function () {
             let departmentChoiceArray = rows.map(
