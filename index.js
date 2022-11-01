@@ -181,16 +181,8 @@ function addDepartment() {
 function addRole() {
   // var departmentData;
   mysqlconnection.query("SELECT * FROM department", (err, rows) => {
+    console.log(rows);
     if (err) throw err;
-    //  let  departmentData = rows;
-    // let departmentChoiceArray = rows.map((choice) => {
-    //   choice.title;
-    //   console.log(departmentChoiceArray);
-    //   return departmentChoiceArray;
-    //     });
-    //   });
-    // }
-
     inquirer
       .prompt([
         {
@@ -205,12 +197,13 @@ function addRole() {
         },
         {
           type: "list",
-          name: "roleDepartment",
+          name: "departmentList",
 
           choices: function () {
-            let departmentChoiceArray = rows.map(
-              (choice) => choice.department_name
-            );
+            let departmentChoiceArray = rows.map((choice) => ({
+              name: choice.department_name,
+              value: choice.department_id,
+            }));
             console.log(departmentChoiceArray);
             return departmentChoiceArray;
           },
@@ -219,15 +212,15 @@ function addRole() {
       ])
       .then((response) => {
         mysqlconnection.query(
-          `INSERT INTO employee_role(title,salary)
-    VALUES (?,?)`,
-          [response.roleName, response.roleSalary]
+          `INSERT INTO employee_role(title,salary, department_id)
+    VALUES (?,?, ?)`,
+          [response.roleName, response.roleSalary, response.departmentList]
         );
-        mysqlconnection.query(
-          `INSERT INTO department(department_name)
-  VALUES (?)`,
-          [response.roleDepartment]
-        );
+        //       mysqlconnection.query(
+        //         `INSERT INTO department(department_name)
+        // VALUES (?)`,
+        //         [response.roleDepartment]
+        //       );
       });
   });
 }
