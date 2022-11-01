@@ -82,6 +82,19 @@ const addEmployeeQuestions = [
   },
 ];
 
+const updateEmployeeQuestions = [
+  {
+    type: "input",
+    message: "What is the employee's id?",
+    name: "employeeId",
+  },
+  {
+    type: "input",
+    message: "What is the employee's new role id?",
+    name: "newEmployeeRole",
+  },
+];
+
 const openingPrompt = () => {
   inquirer.prompt(openingQuestion).then((response) => {
     if (response.task === "view all departments") {
@@ -97,7 +110,7 @@ const openingPrompt = () => {
     } else if (response.task === "add an employee") {
       addEmployee();
     } else if (response.task === "update an employee role") {
-      updateRole();
+      updateEmployee();
     }
   });
 };
@@ -125,10 +138,6 @@ function viewAllRoles() {
     .then(() => openingPrompt());
 }
 
-// `SELECT department.department_name, employee_role.title, employee_role.salary, employee_info.employee_id, employee_info.first_name,employee_info.last_name, employee_info.manager_id
-//      FROM department JOIN employee_role ON department.department_id= employee_role.department_id
-//      JOIN employee_info ON employee_role.role_id =employee_info.role_id`,
-//function to view all employees
 function viewAllEmployees() {
   mysqlconnection
     .promise()
@@ -216,6 +225,23 @@ function addEmployee() {
       )
       .then(() => {
         console.log("employee added successfully");
+      })
+      .catch(console.error)
+      .then(() => openingPrompt());
+  });
+}
+
+function updateEmployee() {
+  inquirer.prompt(updateEmployeeQuestions).then((response) => {
+    mysqlconnection
+      .promise()
+      .query(
+        `UPDATE employee_info SET role_id=? WHERE
+      employee_info.employee_id = ?`,
+        [response.newEmployeeRole, response.employeeId]
+      )
+      .then(() => {
+        console.log("updated successfully");
       })
       .catch(console.error)
       .then(() => openingPrompt());
