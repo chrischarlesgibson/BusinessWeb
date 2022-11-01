@@ -28,6 +28,7 @@ const openingQuestion = [
       "add a role",
       "add an employee",
       "update an employee role",
+      "exit",
     ],
   },
 ];
@@ -103,54 +104,124 @@ const openingPrompt = () => {
 
 // function to view all departments
 function viewAllDepartments() {
-  mysqlconnection.query("SELECT * FROM department;", function (err, res) {
-    if (err) throw err;
-    console.table(res);
-  });
+  mysqlconnection
+    .promise()
+    .query("SELECT * FROM department;")
+    .then((results) => {
+      console.table(results[0]);
+    })
+    .catch(console.error)
+    .then(() => openingPrompt());
 }
-
 //function to view all roles
 function viewAllRoles() {
-  mysqlconnection.query("SELECT * FROM employee_role;", function (err, res) {
-    if (err) throw err;
-    console.table(res);
+  mysqlconnection
+    .promise()
+    .query("SELECT * FROM employee_role;")
+    .then((results) => {
+      console.table(results[0]);
+    })
+    .catch(console.error)
+    .then(() => openingPrompt());
+}
+
+// `SELECT department.department_name, employee_role.title, employee_role.salary, employee_info.employee_id, employee_info.first_name,employee_info.last_name, employee_info.manager_id
+//      FROM department JOIN employee_role ON department.department_id= employee_role.department_id
+//      JOIN employee_info ON employee_role.role_id =employee_info.role_id`,
+//function to view all employees
+function viewAllEmployees() {
+  mysqlconnection
+    .promise()
+    .query(
+      `SELECT employee_info.employee_id,  employee_info.first_name, employee_info.last_name, employee_role.title, department.department_name AS department, employee_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee_info LEFT JOIN employee_role on employee_role.role_id =  employee_info.role_id  LEFT JOIN department on department.department_id = employee_role.department_id LEFT JOIN employee_info manager on manager.manager_id = employee_info.manager_id
+    ORDER by employee_info.last_name;`
+    )
+    .then((results) => {
+      console.table(results[0]);
+    })
+    .catch(console.error)
+    .then(() => openingPrompt());
+}
+
+function addDepartment() {
+  inquirer.prompt(addDepartmentQuestion).then((response) => {
+    mysqlconnection
+      .promise()
+      .query(
+        `INSERT INTO department(department_name)
+  VALUES (?)`,
+        [response.departmentName]
+      )
+      .then(() => {
+        console.log("department added successfully");
+      })
+      .catch(console.log("this is already a department"))
+      .then(() => openingPrompt());
   });
 }
 
-//function to view all employees
-function viewAllEmployees() {
-  mysqlconnection.query(
-    `SELECT department.department_name, employee_role.title, employee_role.salary, employee_info.employee_id, employee_info.first_name,employee_info.last_name, employee_info.manager_id
-     FROM department JOIN employee_role ON department.department_id= employee_role.department_id
-     JOIN employee_info ON employee_role.role_id =employee_info.role_id`,
-    function (err, res) {
-      if (err) throw err;
-      console.table(res);
-    }
-  );
-}
-function addDepartment() {
-  inquirer.prompt(addDepartmentQuestion).then((response) => {
-    mysqlconnection.query(`INSERT INTO department(department_id,department_name)
-  VALUES (0, "${response.departmentName}")`);
+//using prepared statements so that mysql package knows to check for any suspicious inputs
+function addRole() {
+  inquirer.prompt(addRoleQuestions).then((response) => {
+    mysqlconnection.query(
+      `INSERT INTO employee_role(title,salary)
+    VALUES (?,?)`,
+      [response.roleName, response.roleSalary]
+    );
+    mysqlconnection.query(
+      `INSERT INTO department(department_name)
+  VALUES (?)`,
+      [response.roleDepartment]
+    );
   });
 }
 
 function addRole() {
   inquirer.prompt(addRoleQuestions).then((response) => {
-    mysqlconnection.query(`INSERT INTO employee_role(title,salary)
-    VALUES ("${response.roleName}", ${response.roleSalary});`);
-    mysqlconnection.query(`INSERT INTO department(department_name)
-  VALUES ("${response.roleDepartment}");`);
+    mysqlconnection.promise().query(
+      `INSERT INTO employee_role(title,salary)
+      VALUES (?,?)`,
+      [response.roleName, response.roleSalary]
+    );
+    mysqlconnection
+      .promise()
+      .query(
+        `INSERT INTO department(department_name)
+  VALUES (?)`,
+        [response.roleDepartment]
+      )
+      .then(() => {
+        console.log("role added successfully");
+      })
+      .catch(console.error)
+      .then(() => openingPrompt());
   });
 }
 
 function addEmployee() {
   inquirer.prompt(addEmployeeQuestions).then((response) => {
-    mysqlconnection.query(`INSERT INTO employee_info(first_name,last_name, manager_id, title)
-    VALUES ("${response.firstName}", "${response.lastName}"), ${response.employeeManager},"${response.employeeRole}";`);
+    console.log(response);
+    mysqlconnection
+      .promise()
+      .query(
+        `INSERT INTO employee_info
+      (first_name,last_name, manager_id,role_id)
+          VALUES (?,?,?,?)`,
+        [
+          response.firstName,
+          response.lastName,
+          response.employeeManager,
+          response.employeeRole,
+        ]
+      )
+      .then(() => {
+        console.log("employee added successfully");
+      })
+      .catch(console.error)
+      .then(() => openingPrompt());
   });
 }
+
 //function to initialize the application when the user types in node index.js in command line
 function init() {
   openingPrompt();
@@ -158,10 +229,3 @@ function init() {
 
 //calling init function
 init();
-
-// mysqlconnection.query(`INSERT INTO employee_info(first_name,last_name)
-// VALUES ("${response.firstName}", "${response.lastName}");`);
-// mysqlconnection.query(`INSERT INTO employee_info(manager_id)
-// VALUES (${response.employeeManager});`);
-// mysqlconnection.query(`INSERT INTO employee_role(title)
-// VALUES ("${response.employeeRole}");`);
