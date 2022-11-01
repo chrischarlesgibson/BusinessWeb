@@ -53,9 +53,16 @@ const addRoleQuestions = [
     name: "roleSalary",
   },
   {
-    type: "input",
-    message: "What department is the role in?",
-    name: "roleDepartment",
+    type: "list",
+    message: "select the role's department",
+    name: "departmentList",
+    choices: function () {
+      let departmentChoiceArray = response.map(
+        (departmentChoice) => departmentChoice.name
+      );
+      console.log(departmentChoiceArray);
+      return departmentChoiceArray;
+    },
   },
 ];
 
@@ -101,6 +108,7 @@ const openingPrompt = () => {
       viewAllDepartments();
     } else if (response.task === "view all roles") {
       viewAllRoles();
+      // getRoleList();
     } else if (response.task === "view all employees") {
       viewAllEmployees();
     } else if (response.task === "add a department") {
