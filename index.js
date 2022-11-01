@@ -127,7 +127,9 @@ const openingPrompt = () => {
 function viewAllDepartments() {
   mysqlconnection
     .promise()
-    .query("SELECT * FROM department;")
+    .query(
+      "SELECT department_id AS ID,department_name AS department  FROM department;"
+    )
     .then((results) => {
       console.table(results[0]);
     })
@@ -138,7 +140,10 @@ function viewAllDepartments() {
 function viewAllRoles() {
   mysqlconnection
     .promise()
-    .query("SELECT * FROM employee_role;")
+    .query(
+      `SELECT employee_role.role_id AS ID,employee_role.title, department_name AS department , employee_role.salary FROM employee_role
+      LEFT JOIN department ON employee_role.department_id= department.department_id ; `
+    )
     .then((results) => {
       console.table(results[0]);
     })
@@ -150,7 +155,7 @@ function viewAllEmployees() {
   mysqlconnection
     .promise()
     .query(
-      `SELECT employee_info.employee_id,  employee_info.first_name, employee_info.last_name, employee_role.title, department.department_name AS department, employee_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee_info LEFT JOIN employee_role on employee_role.role_id =  employee_info.role_id  LEFT JOIN department on department.department_id = employee_role.department_id LEFT JOIN employee_info manager on manager.manager_id = employee_info.manager_id
+      `SELECT employee_info.employee_id AS ID,  employee_info.first_name, employee_info.last_name, employee_role.title, department.department_name AS department, employee_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee_info LEFT JOIN employee_role on employee_role.role_id =  employee_info.role_id  LEFT JOIN department on department.department_id = employee_role.department_id LEFT JOIN employee_info manager on manager.manager_id = employee_info.manager_id
     ORDER by employee_info.last_name;`
     )
     .then((results) => {
@@ -216,59 +221,107 @@ function addRole() {
     VALUES (?,?, ?)`,
           [response.roleName, response.roleSalary, response.departmentList]
         );
-        //       mysqlconnection.query(
-        //         `INSERT INTO department(department_name)
-        // VALUES (?)`,
-        //         [response.roleDepartment]
-        //       );
       });
   });
 }
-// function addRole() {
-//   inquirer.prompt(addRoleQuestions).then((response) => {
-//     mysqlconnection.promise().query(
-//       `INSERT INTO employee_role(title,salary)
-//       VALUES (?,?)`,
-//       [response.roleName, response.roleSalary]
-//     );
+
+function addEmployee() {
+  // var departmentData;
+  mysqlconnection.query(
+    "SELECT * FROM employee_role, employee_info",
+    (err, rowsRole) => {
+      console.log(rowsRole);
+      if (err) throw err;
+      return;
+    },
+
+    mysqlconnection.query(
+      "SELECT * FROM employee_info",
+      (err, rows) => {
+        console.log(rows);
+        if (err) throw err;
+        return;
+      },
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            message: "What is the employee's first name?",
+            name: "firstName",
+          },
+          {
+            type: "input",
+            message: "What is the employee's last name?",
+            name: "lastName",
+          },
+          {
+            type: "list",
+            name: "employeeRole",
+            choices: function () {
+              let roleChoiceArray = rowsRole.map((choice) => ({
+                name: choice.title,
+                value: choice.role_id,
+              }));
+              console.log(roleChoiceArray);
+              return roleChoiceArray;
+            },
+            message: "What is the employee's role?",
+          },
+          {
+            type: "list",
+            name: "employeeManager",
+
+            choices: function () {
+              let managerChoiceArray = rows.map((choice) => ({
+                name: choice.manager,
+                value: choice.manager_id,
+              }));
+              console.log(managerChoiceArray);
+              return managerChoiceArray;
+            },
+            message: "Who is the employee's manager?",
+          },
+        ])
+
+        .then((response) => {
+          mysqlconnection.query(
+            `INSERT INTO employee_info(employee_id, first_name, last_name,title, department_id, salary, manager)
+    VALUES (?,?,?,?)`,
+            [
+              response.firstName,
+              response.lastName,
+              response.employeeManager,
+              response.employeeRole,
+            ]
+          );
+        })
+    )
+  );
+}
+
+// function addEmployee() {
+//   inquirer.prompt(addEmployeeQuestions).then((response) => {
+//     console.log(response);
 //     mysqlconnection
 //       .promise()
 //       .query(
-//         `INSERT INTO department(department_name)
-//   VALUES (?)`,
-//         [response.roleDepartment]
+//         `INSERT INTO employee_info
+//       (first_name,last_name, manager_id,role_id)
+//           VALUES (?,?,?,?)`,
+//         [
+//           response.firstName,
+//           response.lastName,
+//           response.employeeManager,
+//           response.employeeRole,
+//         ]
 //       )
 //       .then(() => {
-//         console.log("role added successfully");
+//         console.log("employee added successfully");
 //       })
 //       .catch(console.error)
 //       .then(() => openingPrompt());
 //   });
 // }
-
-function addEmployee() {
-  inquirer.prompt(addEmployeeQuestions).then((response) => {
-    console.log(response);
-    mysqlconnection
-      .promise()
-      .query(
-        `INSERT INTO employee_info
-      (first_name,last_name, manager_id,role_id)
-          VALUES (?,?,?,?)`,
-        [
-          response.firstName,
-          response.lastName,
-          response.employeeManager,
-          response.employeeRole,
-        ]
-      )
-      .then(() => {
-        console.log("employee added successfully");
-      })
-      .catch(console.error)
-      .then(() => openingPrompt());
-  });
-}
 
 function updateEmployee() {
   inquirer.prompt(updateEmployeeQuestions).then((response) => {
