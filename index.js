@@ -41,30 +41,30 @@ const addDepartmentQuestion = [
   },
 ];
 
-const addRoleQuestions = [
-  {
-    type: "input",
-    message: "What is the role?",
-    name: "roleName",
-  },
-  {
-    type: "input",
-    message: "What is the role's salary?",
-    name: "roleSalary",
-  },
-  {
-    type: "list",
-    message: "select the role's department",
-    name: "departmentList",
-    choices: function () {
-      let departmentChoiceArray = response.map(
-        (departmentChoice) => departmentChoice.name
-      );
-      console.log(departmentChoiceArray);
-      return departmentChoiceArray;
-    },
-  },
-];
+// const addRoleQuestions = [
+//   {
+//     type: "input",
+//     message: "What is the role?",
+//     name: "roleName",
+//   },
+//   {
+//     type: "input",
+//     message: "What is the role's salary?",
+//     name: "roleSalary",
+//   },
+//   {
+//     type: "list",
+//     message: "select the role's department",
+//     name: "departmentList",
+//     choices: function () {
+//       let departmentChoiceArray = response.map(
+//         (departmentChoice) => departmentChoice.name
+//       );
+//       console.log(departmentChoiceArray);
+//       return departmentChoiceArray;
+//     },
+//   },
+// ];
 
 const addEmployeeQuestions = [
   {
@@ -179,41 +179,79 @@ function addDepartment() {
 
 //using prepared statements so that mysql package knows to check for any suspicious inputs
 function addRole() {
-  inquirer.prompt(addRoleQuestions).then((response) => {
-    mysqlconnection.query(
-      `INSERT INTO employee_role(title,salary)
-    VALUES (?,?)`,
-      [response.roleName, response.roleSalary]
-    );
-    mysqlconnection.query(
-      `INSERT INTO department(department_name)
-  VALUES (?)`,
-      [response.roleDepartment]
-    );
-  });
-}
+  // var departmentData;
+  mysqlconnection.query("SELECT * FROM department", (err, rows) => {
+    if (err) throw err;
+    //  let  departmentData = rows;
+    // let departmentChoiceArray = rows.map((choice) => {
+    //   choice.title;
+    //   console.log(departmentChoiceArray);
+    //   return departmentChoiceArray;
+    //     });
+    //   });
+    // }
 
-function addRole() {
-  inquirer.prompt(addRoleQuestions).then((response) => {
-    mysqlconnection.promise().query(
-      `INSERT INTO employee_role(title,salary)
-      VALUES (?,?)`,
-      [response.roleName, response.roleSalary]
-    );
-    mysqlconnection
-      .promise()
-      .query(
-        `INSERT INTO department(department_name)
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "What is the role?",
+          name: "roleName",
+        },
+        {
+          type: "input",
+          message: "What is the role's salary?",
+          name: "roleSalary",
+        },
+        {
+          type: "list",
+          name: "departmentList",
+
+          choices: function () {
+            let departmentChoiceArray = rows.map(
+              (choice) => choice.department_name
+            );
+            console.log(departmentChoiceArray);
+            return departmentChoiceArray;
+          },
+          message: "select the role's department",
+        },
+      ])
+      .then((response) => {
+        mysqlconnection.query(
+          `INSERT INTO employee_role(title,salary)
+    VALUES (?,?)`,
+          [response.roleName, response.roleSalary]
+        );
+        mysqlconnection.query(
+          `INSERT INTO department(department_name)
   VALUES (?)`,
-        [response.roleDepartment]
-      )
-      .then(() => {
-        console.log("role added successfully");
-      })
-      .catch(console.error)
-      .then(() => openingPrompt());
+          [response.roleDepartment]
+        );
+      });
   });
 }
+// function addRole() {
+//   inquirer.prompt(addRoleQuestions).then((response) => {
+//     mysqlconnection.promise().query(
+//       `INSERT INTO employee_role(title,salary)
+//       VALUES (?,?)`,
+//       [response.roleName, response.roleSalary]
+//     );
+//     mysqlconnection
+//       .promise()
+//       .query(
+//         `INSERT INTO department(department_name)
+//   VALUES (?)`,
+//         [response.roleDepartment]
+//       )
+//       .then(() => {
+//         console.log("role added successfully");
+//       })
+//       .catch(console.error)
+//       .then(() => openingPrompt());
+//   });
+// }
 
 function addEmployee() {
   inquirer.prompt(addEmployeeQuestions).then((response) => {
