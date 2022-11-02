@@ -280,7 +280,7 @@ function addEmployee() {
         // employee_id, in field list
         .then((response) => {
           mysqlconnection.query(
-            `INSERT INTO employee_info( first_name, last_name,role_id,  manager_id)
+            `INSERT INTO employee_info( first_name, last_name,manager_id, role_id)
     VALUES (?,?,?,?)`,
             [
               response.firstName,
@@ -395,6 +395,8 @@ function addEmployee() {
 //     });
 //   });
 // }
+
+function getManagerNames() {}
 //function to initialize the application when the user types in node index.js in command line
 function init() {
   openingPrompt();
