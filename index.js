@@ -226,7 +226,6 @@ function addRole() {
 }
 
 function addEmployee() {
-  // var departmentData;
   mysqlconnection.query("SELECT * FROM employee_role", (err, rowsRole) => {
     console.log(rowsRole);
     if (err) throw err;
@@ -275,9 +274,6 @@ function addEmployee() {
             message: "Who is the employee's manager?",
           },
         ])
-        // department_id, salary, need to add to table below bw dep id and salaray
-
-        // employee_id, in field list
         .then((response) => {
           mysqlconnection.query(
             `INSERT INTO employee_info( first_name, last_name,manager_id, role_id)
@@ -293,32 +289,6 @@ function addEmployee() {
     });
   });
 }
-//   );
-// }
-
-// function addEmployee() {
-//   inquirer.prompt(addEmployeeQuestions).then((response) => {
-//     console.log(response);
-//     mysqlconnection
-//       .promise()
-//       .query(
-//         `INSERT INTO employee_info
-//       (first_name,last_name, manager_id,role_id)
-//           VALUES (?,?,?,?)`,
-//         [
-//           response.firstName,
-//           response.lastName,
-//           response.employeeManager,
-//           response.employeeRole,
-//         ]
-//       )
-//       .then(() => {
-//         console.log("employee added successfully");
-//       })
-//       .catch(console.error)
-//       .then(() => openingPrompt());
-//   });
-// }
 
 // function updateEmployeeRole() {
 //   inquirer.prompt(updateEmployeeQuestions).then((response) => {
@@ -337,66 +307,59 @@ function addEmployee() {
 //   });
 // }
 
-// function updateEmployeeRole() {
-//   // var departmentData;
-//   mysqlconnection.query("SELECT * FROM employee_info", (err, rowsName) => {
-//     console.log(rowsName);
-//     if (err) throw err;
+function updateEmployeeRole() {
+  mysqlconnection.query("SELECT * FROM employee_info", (err, rowsName) => {
+    console.log(rowsName);
+    if (err) throw err;
 
-//     mysqlconnection.query("SELECT * FROM employee_role", (err, rows) => {
-//       console.log(rows);
-//       if (err) throw err;
+    mysqlconnection.query("SELECT * FROM employee_role", (err, rows) => {
+      console.log(rows);
+      if (err) throw err;
 
-//       inquirer
-//         .prompt([
-//           {
-//             type: "list",
-//             name: "employeeFullname",
-//             choices: function () {
-//               let EmployeeFullname = rowsName.map((choice) => ({
-//                 name: choice.first_name + " " + choice.last_name,
-//                 value: choice.role_id,
-//               }));
-//               console.log(EmployeeFullname);
-//               return EmployeeFullname;
-//             },
-//             message: "What is the employee's name that you want to reassign?",
-//           },
-//           {
-//             type: "list",
-//             name: "employeeManager",
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "employeeFullname",
+            choices: function () {
+              let EmployeeFullname = rowsName.map((choice) => ({
+                name: choice.first_name + " " + choice.last_name,
+                value: choice.employee_id,
+              }));
+              console.log(EmployeeFullname);
+              return EmployeeFullname;
+            },
+            message: "What is the employee's name that you want to reassign?",
+          },
+          {
+            type: "list",
+            name: "reassignRoleList",
 
-//             choices: function () {
-//               let managerChoiceArray = rows.map((choice) => ({
-//                 name: choice.manager,
-//                 value: choice.manager_id,
-//               }));
-//               console.log(managerChoiceArray);
-//               return managerChoiceArray;
-//             },
-//             message: "Who is the employee's manager?",
-//           },
-//         ])
-//         // department_id, salary, need to add to table below bw dep id and salaray
+            choices: function () {
+              let reassignEmployee = rows.map((choice) => ({
+                name: choice.department_name,
+                value: choice.title,
+              }));
+              console.log(reassignEmployee);
+              return reassignEmployee;
+            },
+            message: "what role should this employee be reassigned to?",
+          },
+        ])
+        // department_id, salary, need to add to table below bw dep id and salaray
 
-//         // employee_id, in field list
-//         .then((response) => {
-//           mysqlconnection.query(
-//             `INSERT INTO employee_info( first_name, last_name,role_id,  manager_id)
-//     VALUES (?,?,?,?)`,
-//             [
-//               response.firstName,
-//               response.lastName,
-//               response.employeeManager,
-//               response.employeeRole,
-//             ]
-//           );
-//         });
-//     });
-//   });
-// }
+        // employee_id, in field list
+        .then((response) => {
+          mysqlconnection.query(
+            `UPDATE employee_info SET role_id=? WHERE employee_id=? 
+             VALUES (?,?)`,
+            [response.reassignRoleList, response.employeeFullname]
+          );
+        });
+    });
+  });
+}
 
-function getManagerNames() {}
 //function to initialize the application when the user types in node index.js in command line
 function init() {
   openingPrompt();
