@@ -22,11 +22,11 @@ Node.js, Inquirer, console.table and mysql2 are required to use this tool. If yo
 
 ## Usage
 
-First go to the command line in the folder that holds your index.js file. Next, type "node index.js" and click enter. you will be asked to enter the manager's info first and after adding the manager you will be asked if you want to add intern(s) and/or engineer(s) to your team page. Once you have added all the egineers and interns that you have on your team, select the "I'm finished, create my team page" option in the command line. A message saying "It's a success! Your team's profile has been generated! check for teamPage.html in you files." will pop up. Your teamPage.html file will have be generated.
+First, download the dependencies by running "npm install", next go into mysql shell and import the seed and schema files by running "source schema.sql" and then "source seed.sql". Next,go to the command line in the folder that holds your index.js file. Finally, type "node index.js" and click enter. The user will then see the actions directory and from there the user can choose what actions to take on their businessWeb.
 
-[click this video link for a demo of Teamified in action!](https://youtu.be/o1SpxDWF_50)
+[click this video link for a demo of BusinessWeb in action!](https://youtu.be/Iqzj7Y3wqA4)
 
-![Teamified photo](./Assets/teamified%20photo.png)
+![BusinessWeb photo](./Assets/BusinessWeb.png)
 
 ## License
 
@@ -37,7 +37,8 @@ Licenseed under the MIT license.[License details here](https://opensource.org/li
 - Javascript
 - node.js
 - Inquirer
-- Jest
+- mysql2
+- table.console
 
 ## Badges
 

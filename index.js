@@ -28,7 +28,6 @@ const openingQuestion = [
       "add a role",
       "add an employee",
       "update an employee role",
-      "exit",
     ],
   },
 ];
@@ -41,74 +40,12 @@ const addDepartmentQuestion = [
   },
 ];
 
-// const addRoleQuestions = [
-//   {
-//     type: "input",
-//     message: "What is the role?",
-//     name: "roleName",
-//   },
-//   {
-//     type: "input",
-//     message: "What is the role's salary?",
-//     name: "roleSalary",
-//   },
-//   {
-//     type: "list",
-//     message: "select the role's department",
-//     name: "departmentList",
-//     choices: function () {
-//       let departmentChoiceArray = response.map(
-//         (departmentChoice) => departmentChoice.name
-//       );
-//       console.log(departmentChoiceArray);
-//       return departmentChoiceArray;
-//     },
-//   },
-// ];
-
-const addEmployeeQuestions = [
-  {
-    type: "input",
-    message: "What is the employee's first name?",
-    name: "firstName",
-  },
-  {
-    type: "input",
-    message: "What is the employee's last name?",
-    name: "lastName",
-  },
-  {
-    type: "input",
-    message: "What is the employee's role?",
-    name: "employeeRole",
-  },
-  {
-    type: "input",
-    message: "Who is the employee's manager?",
-    name: "employeeManager",
-  },
-];
-
-const updateEmployeeQuestions = [
-  {
-    type: "input",
-    message: "What is the employee's id?",
-    name: "employeeId",
-  },
-  {
-    type: "input",
-    message: "What is the employee's new role id?",
-    name: "newEmployeeRole",
-  },
-];
-
 const openingPrompt = () => {
   inquirer.prompt(openingQuestion).then((response) => {
     if (response.task === "view all departments") {
       viewAllDepartments();
     } else if (response.task === "view all roles") {
       viewAllRoles();
-      // getRoleList();
     } else if (response.task === "view all employees") {
       viewAllEmployees();
     } else if (response.task === "add a department") {
@@ -150,7 +87,7 @@ function viewAllRoles() {
     .catch(console.error)
     .then(() => openingPrompt());
 }
-
+//function to view all employees
 function viewAllEmployees() {
   mysqlconnection
     .promise()
@@ -165,6 +102,7 @@ function viewAllEmployees() {
     .then(() => openingPrompt());
 }
 
+//fuction to add a department
 function addDepartment() {
   inquirer.prompt(addDepartmentQuestion).then((response) => {
     mysqlconnection
@@ -177,16 +115,16 @@ function addDepartment() {
       .then(() => {
         console.log("department added successfully");
       })
-      .catch(console.log("this is already a department"))
+      .catch(console.error)
       .then(() => openingPrompt());
   });
 }
 
 //using prepared statements so that mysql package knows to check for any suspicious inputs
+//function to add role
+
 function addRole() {
-  // var departmentData;
   mysqlconnection.query("SELECT * FROM department", (err, rows) => {
-    console.log(rows);
     if (err) throw err;
     inquirer
       .prompt([
@@ -203,13 +141,12 @@ function addRole() {
         {
           type: "list",
           name: "departmentList",
-
+          // here im turning the results of the above query into an array by using .map . so the array will contain all of the department names that are already in the sql database and then this array can be displayed as a list of option that the user can select from
           choices: function () {
             let departmentChoiceArray = rows.map((choice) => ({
               name: choice.department_name,
               value: choice.department_id,
             }));
-            console.log(departmentChoiceArray);
             return departmentChoiceArray;
           },
           message: "select the role's department",
@@ -221,17 +158,21 @@ function addRole() {
     VALUES (?,?, ?)`,
           [response.roleName, response.roleSalary, response.departmentList]
         );
-      });
+      })
+      .then(() => {
+        console.log("role added successfully");
+      })
+      .catch(console.error)
+      .then(() => openingPrompt());
   });
 }
 
+//function to add a new employee
 function addEmployee() {
   mysqlconnection.query("SELECT * FROM employee_role", (err, rowsRole) => {
-    console.log(rowsRole);
     if (err) throw err;
 
     mysqlconnection.query("SELECT * FROM employee_info", (err, rows) => {
-      console.log(rows);
       if (err) throw err;
 
       inquirer
@@ -250,11 +191,11 @@ function addEmployee() {
             type: "list",
             name: "employeeRole",
             choices: function () {
+              // here im turning the results of the above query into an array by using .map(using the first query that returns rowsRole) . so the array will contain all of the role names that are already in the sql database and then this array can be displayed as a list of options that the user can select from
               let roleChoiceArray = rowsRole.map((roleChoice) => ({
                 name: roleChoice.title,
                 value: roleChoice.role_id,
               }));
-              console.log(roleChoiceArray);
               return roleChoiceArray;
             },
             message: "What is the employee's role?",
@@ -264,11 +205,11 @@ function addEmployee() {
             name: "employeeManager",
 
             choices: function () {
+              // here im turning the results of the above query (the second one.. using rows as the name i gave it)into an array by using .map . so the array will contain all of the role names that are already in the sql database and then this array can be displayed as a list of options that the user can select from
               let managerChoiceArray = rows.map((managerChoice) => ({
                 name: managerChoice.first_name + " " + managerChoice.last_name,
                 value: managerChoice.employee_id,
               }));
-              console.log(managerChoiceArray);
               return managerChoiceArray;
             },
             message: "Who is the employee's manager?",
@@ -285,35 +226,22 @@ function addEmployee() {
               response.employeeRole,
             ]
           );
-        });
+        })
+        .then(() => {
+          console.log("employee added successfully");
+        })
+        .catch(console.error)
+        .then(() => openingPrompt());
     });
   });
 }
 
-// function updateEmployeeRole() {
-//   inquirer.prompt(updateEmployeeQuestions).then((response) => {
-//     mysqlconnection
-//       .promise()
-//       .query(
-//         `UPDATE employee_info SET role_id=? WHERE
-//       employee_info.employee_id = ?`,
-//         [response.newEmployeeRole, response.employeeId]
-//       )
-//       .then(() => {
-//         console.log("updated successfully");
-//       })
-//       .catch(console.error)
-//       .then(() => openingPrompt());
-//   });
-// }
-
+//function that allows user to update an existing employees role
 function updateEmployeeRole() {
   mysqlconnection.query("SELECT * FROM employee_info", (err, rowsName) => {
-    console.log(rowsName);
     if (err) throw err;
 
     mysqlconnection.query("SELECT * FROM employee_role", (err, rows) => {
-      console.log(rows);
       if (err) throw err;
 
       inquirer
@@ -322,11 +250,11 @@ function updateEmployeeRole() {
             type: "list",
             name: "employeeFullname",
             choices: function () {
+              //displaying list of full employee names that are in the database already so they can pick who is the manager of this employee
               let EmployeeFullname = rowsName.map((choice) => ({
                 name: choice.first_name + " " + choice.last_name,
                 value: choice.employee_id,
               }));
-              console.log(EmployeeFullname);
               return EmployeeFullname;
             },
             message: "What is the employee's name that you want to reassign?",
@@ -336,26 +264,27 @@ function updateEmployeeRole() {
             name: "reassignRoleList",
 
             choices: function () {
+              //list of role names to choose from
               let reassignEmployee = rows.map((choice) => ({
-                name: choice.department_name,
-                value: choice.title,
+                name: choice.title,
+                value: choice.role_id,
               }));
-              console.log(reassignEmployee);
               return reassignEmployee;
             },
             message: "what role should this employee be reassigned to?",
           },
         ])
-        // department_id, salary, need to add to table below bw dep id and salaray
-
-        // employee_id, in field list
         .then((response) => {
           mysqlconnection.query(
-            `UPDATE employee_info SET role_id=? WHERE employee_id=? 
-             VALUES (?,?)`,
+            `UPDATE employee_info SET role_id=? WHERE employee_id=?`,
             [response.reassignRoleList, response.employeeFullname]
           );
-        });
+        })
+        .then(() => {
+          console.log("employee role changed successfully");
+        })
+        .catch(console.error)
+        .then(() => openingPrompt());
     });
   });
 }
