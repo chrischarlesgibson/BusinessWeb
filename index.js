@@ -155,7 +155,7 @@ function viewAllEmployees() {
   mysqlconnection
     .promise()
     .query(
-      `SELECT employee_info.employee_id AS ID,  employee_info.first_name, employee_info.last_name, employee_role.title, department.department_name AS department, employee_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee_info LEFT JOIN employee_role on employee_role.role_id =  employee_info.role_id  LEFT JOIN department on department.department_id = employee_role.department_id LEFT JOIN employee_info manager on manager.manager_id = employee_info.manager_id
+      `SELECT employee_info.employee_id AS ID,  employee_info.first_name, employee_info.last_name, employee_role.title, department.department_name AS department, employee_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee_info LEFT JOIN employee_role on employee_role.role_id =  employee_info.role_id  LEFT JOIN department on department.department_id = employee_role.department_id LEFT JOIN  employee_info manager ON manager.employee_id = employee_info.manager_id
     ORDER by employee_info.last_name;`
     )
     .then((results) => {
@@ -266,8 +266,8 @@ function addEmployee() {
 
             choices: function () {
               let managerChoiceArray = rows.map((managerChoice) => ({
-                name: managerChoice.manager,
-                value: managerChoice.manager_id,
+                name: managerChoice.first_name + " " + managerChoice.last_name,
+                value: managerChoice.employee_id,
               }));
               console.log(managerChoiceArray);
               return managerChoiceArray;
