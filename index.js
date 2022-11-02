@@ -118,7 +118,7 @@ const openingPrompt = () => {
     } else if (response.task === "add an employee") {
       addEmployee();
     } else if (response.task === "update an employee role") {
-      updateEmployee();
+      updateEmployeeRole();
     }
   });
 };
@@ -251,9 +251,9 @@ function addEmployee() {
             type: "list",
             name: "employeeRole",
             choices: function () {
-              let roleChoiceArray = rowsRole.map((choice) => ({
-                name: choice.title,
-                value: choice.role_id,
+              let roleChoiceArray = rowsRole.map((roleChoice) => ({
+                name: roleChoice.title,
+                value: roleChoice.role_id,
               }));
               console.log(roleChoiceArray);
               return roleChoiceArray;
@@ -265,9 +265,9 @@ function addEmployee() {
             name: "employeeManager",
 
             choices: function () {
-              let managerChoiceArray = rows.map((choice) => ({
-                name: choice.manager,
-                value: choice.manager_id,
+              let managerChoiceArray = rows.map((managerChoice) => ({
+                name: managerChoice.manager,
+                value: managerChoice.manager_id,
               }));
               console.log(managerChoiceArray);
               return managerChoiceArray;
@@ -320,23 +320,81 @@ function addEmployee() {
 //   });
 // }
 
-function updateEmployee() {
-  inquirer.prompt(updateEmployeeQuestions).then((response) => {
-    mysqlconnection
-      .promise()
-      .query(
-        `UPDATE employee_info SET role_id=? WHERE
-      employee_info.employee_id = ?`,
-        [response.newEmployeeRole, response.employeeId]
-      )
-      .then(() => {
-        console.log("updated successfully");
-      })
-      .catch(console.error)
-      .then(() => openingPrompt());
-  });
-}
+// function updateEmployeeRole() {
+//   inquirer.prompt(updateEmployeeQuestions).then((response) => {
+//     mysqlconnection
+//       .promise()
+//       .query(
+//         `UPDATE employee_info SET role_id=? WHERE
+//       employee_info.employee_id = ?`,
+//         [response.newEmployeeRole, response.employeeId]
+//       )
+//       .then(() => {
+//         console.log("updated successfully");
+//       })
+//       .catch(console.error)
+//       .then(() => openingPrompt());
+//   });
+// }
 
+// function updateEmployeeRole() {
+//   // var departmentData;
+//   mysqlconnection.query("SELECT * FROM employee_info", (err, rowsName) => {
+//     console.log(rowsName);
+//     if (err) throw err;
+
+//     mysqlconnection.query("SELECT * FROM employee_role", (err, rows) => {
+//       console.log(rows);
+//       if (err) throw err;
+
+//       inquirer
+//         .prompt([
+//           {
+//             type: "list",
+//             name: "employeeFullname",
+//             choices: function () {
+//               let EmployeeFullname = rowsName.map((choice) => ({
+//                 name: choice.first_name + " " + choice.last_name,
+//                 value: choice.role_id,
+//               }));
+//               console.log(EmployeeFullname);
+//               return EmployeeFullname;
+//             },
+//             message: "What is the employee's name that you want to reassign?",
+//           },
+//           {
+//             type: "list",
+//             name: "employeeManager",
+
+//             choices: function () {
+//               let managerChoiceArray = rows.map((choice) => ({
+//                 name: choice.manager,
+//                 value: choice.manager_id,
+//               }));
+//               console.log(managerChoiceArray);
+//               return managerChoiceArray;
+//             },
+//             message: "Who is the employee's manager?",
+//           },
+//         ])
+//         // department_id, salary, need to add to table below bw dep id and salaray
+
+//         // employee_id, in field list
+//         .then((response) => {
+//           mysqlconnection.query(
+//             `INSERT INTO employee_info( first_name, last_name,role_id,  manager_id)
+//     VALUES (?,?,?,?)`,
+//             [
+//               response.firstName,
+//               response.lastName,
+//               response.employeeManager,
+//               response.employeeRole,
+//             ]
+//           );
+//         });
+//     });
+//   });
+// }
 //function to initialize the application when the user types in node index.js in command line
 function init() {
   openingPrompt();
