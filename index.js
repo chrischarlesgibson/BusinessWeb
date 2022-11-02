@@ -231,66 +231,66 @@ function addEmployee() {
     console.log(rowsRole);
     if (err) throw err;
 
-    // mysqlconnection.query("SELECT * FROM employee_info", (err, rows) => {
-    //   console.log(rows);
-    //   if (err) throw err;
-    //     return;
-    //   }
-    inquirer
-      .prompt([
-        {
-          type: "input",
-          message: "What is the employee's first name?",
-          name: "firstName",
-        },
-        {
-          type: "input",
-          message: "What is the employee's last name?",
-          name: "lastName",
-        },
-        {
-          type: "list",
-          name: "employeeRole",
-          choices: function () {
-            let roleChoiceArray = rowsRole.map((choice) => ({
-              name: choice.title,
-              value: choice.role_id,
-            }));
-            console.log(roleChoiceArray);
-            return roleChoiceArray;
+    mysqlconnection.query("SELECT * FROM employee_info", (err, rows) => {
+      console.log(rows);
+      if (err) throw err;
+
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            message: "What is the employee's first name?",
+            name: "firstName",
           },
-          message: "What is the employee's role?",
-        },
-        // {
-        //   type: "list",
-        //   name: "employeeManager",
+          {
+            type: "input",
+            message: "What is the employee's last name?",
+            name: "lastName",
+          },
+          {
+            type: "list",
+            name: "employeeRole",
+            choices: function () {
+              let roleChoiceArray = rowsRole.map((choice) => ({
+                name: choice.title,
+                value: choice.role_id,
+              }));
+              console.log(roleChoiceArray);
+              return roleChoiceArray;
+            },
+            message: "What is the employee's role?",
+          },
+          {
+            type: "list",
+            name: "employeeManager",
 
-        //   choices: function () {
-        //     let managerChoiceArray = rows.map((choice) => ({
-        //       name: choice.manager,
-        //       value: choice.manager_id,
-        //     }));
-        //     console.log(managerChoiceArray);
-        //     return managerChoiceArray;
-        //   },
-        //   message: "Who is the employee's manager?",
-        // },
-      ])
-      // department_id, salary, need to add to table below bw dep id and salaray
+            choices: function () {
+              let managerChoiceArray = rows.map((choice) => ({
+                name: choice.manager,
+                value: choice.manager_id,
+              }));
+              console.log(managerChoiceArray);
+              return managerChoiceArray;
+            },
+            message: "Who is the employee's manager?",
+          },
+        ])
+        // department_id, salary, need to add to table below bw dep id and salaray
 
-      // employee_id, in field list
-      .then((response) => {
-        mysqlconnection.query(
-          `INSERT INTO employee_info( first_name, last_name,role_id,  manager_id)
+        // employee_id, in field list
+        .then((response) => {
+          mysqlconnection.query(
+            `INSERT INTO employee_info( first_name, last_name,role_id,  manager_id)
     VALUES (?,?,?,?)`,
-          [
-            response.firstName,
-            response.lastName,
-            response.employeeManager,
-            response.employeeRole,
-          ]
-        );
-      });
+            [
+              response.firstName,
+              response.lastName,
+              response.employeeManager,
+              response.employeeRole,
+            ]
+          );
+        });
+    });
   });
 }
 //   );
