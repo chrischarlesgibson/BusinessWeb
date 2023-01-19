@@ -4,7 +4,7 @@
 
 ## Description
 
-BusinessWeb is a command line application that helps business owners create a database for thier business. It is intended to be used as a way to hold information about your employees, your roles and your departments. Teamified uses node.js,Inquirer and mysql to allow users to input their business's data into sql tables and databases.
+BusinessWeb is a command line application that helps business owners create a database for thier business. It is intended to be used as a way to hold information about your employees, your roles and your departments. BusinessWeb uses node.js,Inquirer and mysql to allow users to input their business's data into sql tables and databases.
 
 ## Table of Contents
 
